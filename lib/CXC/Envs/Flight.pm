@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
@@ -135,7 +135,7 @@ sub add_unique_path {
     my @path = split ':', $path;
     
     # Put the new path elements at the front
-    map { unshift @path, $_ } @new;
+    map { unshift @path, $_ } reverse @new;
     
     # Build up a new path which eliminates any duplicates
     my %new_path;
