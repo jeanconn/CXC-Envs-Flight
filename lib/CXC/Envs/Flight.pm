@@ -28,7 +28,9 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = '$Id: Flight.pm,v 1.4 2004-10-04 21:30:13 aldcroft Exp $';  # '
+# our $VERSION = '0.02';
+
 our %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
@@ -120,7 +122,13 @@ sub flt_environment {
     # Set PATH
 
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB}, $env{"${FLT}_PERLLIB"}, $env{MST_PERLLIB});
-    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"});
+
+
+    my $OS = `uname`;
+    my @sys_path;
+    @sys_path = qw(/usr/bin /usr/local/bin /opt/local/bin /usr/ccs/bin /usr/ucb) if ($OS eq 'SunOS');
+    @sys_path = qw(/usr/bin /bin /usr/local/bin) if ($OS eq 'Linux');
+    $env{PATH} = add_unique_path($ENV{PATH}, @sys_path, $env{"${FLT}_BIN"});
 
     return %env;
 }
