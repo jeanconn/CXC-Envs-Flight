@@ -1,0 +1,6 @@
+Revision history for Perl extension CXC::Envs::Flight.
+
+0.01  Tue Aug 24 16:52:56 2004
+	- original version; created by h2xs 1.23 with options
+		--omit-XS -n CXC::Envs::Flight
+

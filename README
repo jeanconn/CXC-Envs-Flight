@@ -1,0 +1,88 @@
+CXC::Envs::Flight(3)  User Contributed Perl Documentation CXC::Envs::Flight(3)
+
+
+
+NNAAMMEE
+       CXC::Envs::Flight - Perl extension to set environment variables for
+       Aspect operations tools
+
+SSYYNNOOPPSSIISS
+         use CXC::Envs::Flight;
+
+         local %ENV = CXC::Envs::Flight::env(’ska’,’tst’); # Adds Ska and TST env to existing ENV
+         $cmds = CXC::Envs::Flight::shell_cmds(’tcsh’,’ska’);     # Return tcsh commands to set environment
+                                                   # Allowed options are tcsh, csh, sh
+
+DDEESSCCRRIIPPTTIIOONN
+       This module sets environment variables for "Flight" software, which
+       currently includes aspect operations tools (Ska) and TST tools (TST).
+
+       If the "ska" environoment is requested, the following environment vari-
+       ables are set unless already defined:
+
+                          Default
+           SKA            /proj/sot/ska
+           SKA_LIB        $SKA/lib
+           SKA_BIN        $SKA/bin
+           SKA_DATA       $SKA/data
+           SKA_SHARE      $SKA/share
+           SKA_PERLLIB    $SKA/lib/perl
+           MST_ROOT       /proj/axaf
+           MST_PERLLIB    ${MST_ROOT}/simul/lib/perl
+
+       It also puts SKA_BIN at the head of the PATH and puts SKA_PERLLIB and
+       MST_PERLLIB at the head of the PERL5LIB path.
+
+       If the file .ska_envs is present in the run directory,
+       CXC::Envs::Flight will use these values to override any defaults or
+       environment variables.  This file consists of name-value pairs, one on
+       each line:
+
+          <VAR> = <VALUE>
+
+       Spaces are not important, and lines preceded by # are ignored.  Vari-
+       able substitution (e.g. SKA_LIB = $SKA/my_lib) is not allowed.
+
+       Likewise, the TST environment sets all the corresponding variables with
+       SKA => TST, where the default TST root directory is
+
+                          Default
+           TST            /proj/sot/tst
+
+FFUUNNCCTTIIOONNSS
+       The following functions are provided
+
+       env(<Flt_env>, ...)
+               Generates the environment variables for the specified flight
+               environments.  Allowed values of <Flt_env> are ’ska’ and ’tst’.
+               If multiple values are specified, they are added from left to
+               right, so libraries/paths from the last one will take prece-
+               dence.
+
+       shell_cmds(<shell_type>, <Flt_env>, ...)
+               Generates the shell commands to set environment variables for
+               the specified flight environments.  The supported shells are
+               sh, ksh, csh, and tcsh.  Allowed values of <Flt_env> are ’ska’
+               and ’tst’.  If multiple values are specified, they are added
+               from left to right, so libraries/paths from the last one will
+               take precedence.
+
+SSEEEE AALLSSOO
+       MST_Envs
+
+       http://jeeves.cfa.harvard.edu/Commons/bin/view/OpsSoftOrg/AspectOpsRe-
+       org
+
+AAUUTTHHOORR
+       Tom Aldcroft, <aldcroft@localdomain>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright (C) 2004 by Tom Aldcroft
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself, either Perl version 5.8.3 or, at
+       your option, any later version of Perl 5 you may have available.
+
+
+
+perl v5.8.3                       2004-08-25              CXC::Envs::Flight(3)
