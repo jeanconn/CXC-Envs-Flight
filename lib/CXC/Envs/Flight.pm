@@ -28,8 +28,8 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '$Id: Flight.pm,v 1.4 2004-10-04 21:30:13 aldcroft Exp $';  # '
-# our $VERSION = '0.02';
+our $version = '$Id: Flight.pm,v 1.5 2004-10-04 21:36:58 aldcroft Exp $';  # '
+our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
