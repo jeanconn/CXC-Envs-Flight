@@ -133,13 +133,21 @@ sub add_unique_path {
     local $_;
     $path = "" unless defined $path;
     my @path = split ':', $path;
-    my %path = map {$_ => 1} @path;
     
-    foreach (@new) {
-	next if $path{$_};
-	unshift @path, $_;
+    # Put the new path elements at the front
+    map { unshift @path, $_ } @new;
+    
+    # Build up a new path which eliminates any duplicates
+    my %new_path;
+    my @new_path;
+    foreach (@path) {
+	next if $new_path{$_};
+	push @new_path, $_;
+	$new_path{$_} = 1;
     }
-    return join(':', @path);
+
+    # Return the colon-separated path
+    return join(':', @new_path);
 }
 
 __END__
