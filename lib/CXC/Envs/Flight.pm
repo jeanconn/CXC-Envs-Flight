@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.7 2005-02-25 15:53:55 aldcroft Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.8 2005-03-08 16:18:31 aldcroft Exp $';  # '
 our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
@@ -120,9 +120,11 @@ sub flt_environment {
     $env{AXAF_ROOT} = $ENV{AXAF_ROOT} || $DEFAULT{MST};
     $env{MST_PERLLIB} = $ENV{MST_PERLLIB} || "$DEFAULT{MST}/simul/lib/perl";
 
-    # Set PATH
-
-    $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB}, $env{"${FLT}_PERLLIB"}, $env{MST_PERLLIB});
+    # Set Perl library path.  Start with SKA_PERLLIB, then /proj/sot/ska/lib/perl, then MST_PERLLIB
+    $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
+				     $env{"${FLT}_PERLLIB"},
+				     $DEFAULT{SKA} . "/lib/perl",
+				     $env{MST_PERLLIB});
 
 
     chomp (my $OS = `uname`);
@@ -144,7 +146,7 @@ sub add_unique_path {
     my @path = split ':', $path;
     
     # Put the new path elements at the front
-    map { unshift @path, $_ } reverse @new;
+    @path = (@new, @path);
     
     # Build up a new path which eliminates any duplicates
     my %new_path;
