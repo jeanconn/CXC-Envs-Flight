@@ -24,7 +24,7 @@ $test = 2;
 
 {
     local %ENV = CXC::Envs::Flight::env('ska');
-#   map { print STDERR "$_ = $ENV{$_}\n" } keys %ENV;
+   map { print STDERR "$_ = $ENV{$_}\n" } keys %ENV;
     ok($ENV{SKA_DATA} eq '/proj/sot/ska/data', "Default environment\n");
     $test++;
 }
