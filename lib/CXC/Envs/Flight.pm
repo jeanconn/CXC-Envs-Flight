@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.6 2004-10-04 22:02:23 aldcroft Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.7 2005-02-25 15:53:55 aldcroft Exp $';  # '
 our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
@@ -91,10 +91,11 @@ sub flt_environment {
     my $flt = shift;
     my $FLT = uc $flt;
     
-    my %new = (LIB => 'lib',
-	       BIN => 'bin',
-	       DATA => 'data',
-	       SHARE => 'share',
+    my %new = (LIB     => 'lib',
+	       BIN     => 'bin',
+	       DATA    => 'data',
+	       SHARE   => 'share',
+	       IDL     => 'idl',
 	       PERLLIB => 'lib/perl',
 	      );
 
@@ -186,6 +187,7 @@ set unless already defined:
     SKA_BIN        $SKA/bin
     SKA_DATA       $SKA/data
     SKA_SHARE      $SKA/share
+    SKA_IDL        $SKA/idl
     SKA_PERLLIB    $SKA/lib/perl
     MST_ROOT       /proj/axaf
     MST_PERLLIB    ${MST_ROOT}/simul/lib/perl
