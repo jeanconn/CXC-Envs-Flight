@@ -28,12 +28,13 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.9 2006-03-09 21:37:13 aca Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.10 2006-04-13 21:24:17 aldcroft Exp $';  # '
 our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
+		SYBASE => '/soft/sybase',
 	       );
 
 # Preloaded methods go here.
@@ -117,6 +118,7 @@ sub flt_environment {
 	$env{"${FLT}_$_"} = $env{"${FLT}_$_"} || $ENV{"${FLT}_$_"} || "$env{$FLT}/$new{$_}";
     }
 
+    $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
     $env{AXAF_ROOT} = $ENV{AXAF_ROOT} || $DEFAULT{MST};
     $env{MST_PERLLIB} = $ENV{MST_PERLLIB} || "$DEFAULT{MST}/simul/lib/perl";
 
