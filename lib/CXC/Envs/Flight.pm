@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.11 2006-04-18 19:50:53 aca Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.12 2006-04-18 19:52:45 aca Exp $';  # '
 our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
@@ -134,7 +134,7 @@ sub flt_environment {
     my @sys_path;
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
-    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"}, "$env{$FLT}/$proc-$OS", @sys_path);
+    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"}, "$env{$FLT}/$proc-$OS/bin", @sys_path);
 
     return %env;
 }
