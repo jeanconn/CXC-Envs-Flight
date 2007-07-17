@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.12 2006-04-18 19:52:45 aca Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.13 2007-07-17 21:28:44 aldcroft Exp $';  # '
 our $VERSION = '1.5';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
@@ -122,6 +122,7 @@ sub flt_environment {
     $env{AXAF_ROOT} = $ENV{AXAF_ROOT} || $DEFAULT{MST};
     $env{MST_PERLLIB} = $ENV{MST_PERLLIB} || "$DEFAULT{MST}/simul/lib/perl";
 
+
     # Set Perl library path.  Start with SKA_PERLLIB, then /proj/sot/ska/lib/perl, then MST_PERLLIB
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
 				     $env{"${FLT}_PERLLIB"},
@@ -129,12 +130,22 @@ sub flt_environment {
 				     $env{MST_PERLLIB});
 
 
-    chomp (my $OS = `uname -s`);
-    chomp (my $proc = `uname -p`);
+
+    my %sysarch;
+    for my $sysarch_path (qw(/proj/sot/ska/bin /proj/axaf/simul/bin), $env{"${FLT}_BIN"}) {
+	my $sysarch = "$sysarch_path/sysarch";
+	if (-x $sysarch) {
+	    my $sysarch_values = `$sysarch -perl_hash`;
+	    %sysarch = eval "( $sysarch_values )";
+	}
+    }
+    chomp (my $OS = $sysarch{OS} || `uname -s`);
+
     my @sys_path;
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
-    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"}, "$env{$FLT}/$proc-$OS/bin", @sys_path);
+
+    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"}, "$env{$FLT}/$sysarch{platform_generic}/bin", @sys_path);
 
     return %env;
 }
@@ -155,6 +166,7 @@ sub add_unique_path {
     my %new_path;
     my @new_path;
     foreach (@path) {
+	next unless defined $_;
 	next if $new_path{$_};
 	push @new_path, $_;
 	$new_path{$_} = 1;
