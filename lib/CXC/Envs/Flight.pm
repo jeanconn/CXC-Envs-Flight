@@ -28,10 +28,10 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.16 2007-07-18 16:38:11 aldcroft Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.17 2007-07-18 19:02:37 aldcroft Exp $';  # '
 our $VERSION = '1.7';
 
-our %DEFAULT = (SKA => '/proj/sot/ska',
+our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
 		SYBASE => '/soft/sybase',
@@ -124,13 +124,14 @@ sub flt_environment {
 
 
     # Set Perl library path.  Start with SKA_PERLLIB, then /proj/sot/ska/lib/perl, then MST_PERLLIB
+    my @perl5lib = ($env{"${FLT}_PERLLIB"},
+		    $env{"${FLT}_PERLLIB"} . '/lib',
+		    $DEFAULT{SKA} . "/lib/perl",
+		    $DEFAULT{SKA} . "/lib/perl/lib");
+    push @perl5lib, $env{MST_PERLLIB} unless defined $ENV{SKA_RE};
+
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
-				     $env{"${FLT}_PERLLIB"},
-				     $env{"${FLT}_PERLLIB"} . '/lib',
-				     $DEFAULT{SKA} . "/lib/perl",
-				     $env{MST_PERLLIB});
-
-
+				     @perl5lib);
 
     my %sysarch;
     for my $sysarch_path (qw(/proj/sot/ska/bin /proj/axaf/simul/bin), $env{"${FLT}_BIN"}) {
