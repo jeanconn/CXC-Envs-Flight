@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.17 2007-07-18 19:02:37 aldcroft Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.18 2007-07-18 19:16:31 aldcroft Exp $';  # '
 our $VERSION = '1.7';
 
 our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
@@ -133,8 +133,9 @@ sub flt_environment {
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
 				     @perl5lib);
 
+    # Find a version of sysarch and run it to determine the system architecture
     my %sysarch;
-    for my $sysarch_path (qw(/proj/sot/ska/bin /proj/axaf/simul/bin), $env{"${FLT}_BIN"}) {
+    for my $sysarch_path ($env{"${FLT}_BIN"}, "$DEFAULT{SKA}/bin") {
 	my $sysarch = "$sysarch_path/sysarch";
 	if (-x $sysarch) {
 	    my $sysarch_values = `$sysarch -perl_hash`;
