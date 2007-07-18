@@ -28,8 +28,8 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.14 2007-07-17 21:30:23 aldcroft Exp $';  # '
-our $VERSION = '1.6';
+our $version = '$Id: Flight.pm,v 1.15 2007-07-18 16:12:03 aldcroft Exp $';  # '
+our $VERSION = '1.7';
 
 our %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
@@ -145,8 +145,28 @@ sub flt_environment {
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
 
-    $env{PATH} = add_unique_path($ENV{PATH}, $env{"${FLT}_BIN"}, "$env{$FLT}/$sysarch{platform_generic}/bin", @sys_path);
+    $env{PATH} = add_unique_path($ENV{PATH},
+				 $env{"${FLT}_BIN"},
+				 "$env{$FLT}/$sysarch{platform_generic}/bin",
+				 @sys_path);
 
+    $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
+					    "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot",
+					    );
+					    
+
+    $env{PGPLOT_DIR} = add_unique_path($ENV{PGPLOT_DIR},
+				       "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot");
+    # Take just the first path value
+    if (defined $env{PGPLOT_DIR}) {
+	$env{PGPLOT_DIR} = (split(':', $env{PGPLOT_DIR}))[0];
+    }
+
+    # Clean out any new ENV vars that are not defined (i.e. no such paths existed)
+    foreach (keys %env) {
+	delete $env{$_} unless defined $env{$_};
+    }
+    
     return %env;
 }
 
@@ -168,12 +188,13 @@ sub add_unique_path {
     foreach (@path) {
 	next unless defined $_;
 	next if $new_path{$_};
+	next unless -d $_;
 	push @new_path, $_;
 	$new_path{$_} = 1;
     }
 
     # Return the colon-separated path
-    return join(':', @new_path);
+    return @new_path ? join(':', @new_path) : undef;
 }
 
 __END__
