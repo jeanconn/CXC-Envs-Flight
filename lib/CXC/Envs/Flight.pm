@@ -28,8 +28,8 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.18 2007-07-18 19:16:31 aldcroft Exp $';  # '
-our $VERSION = '1.7';
+our $version = '$Id: Flight.pm,v 1.19 2007-10-30 14:33:50 aldcroft Exp $';  # '
+our $VERSION = '1.8';
 
 our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 		TST => '/proj/sot/tst',
@@ -150,15 +150,18 @@ sub flt_environment {
 
     $env{PATH} = add_unique_path($ENV{PATH},
 				 $env{"${FLT}_BIN"},
+				 "$env{$FLT}/$sysarch{platform_os_generic}/bin",
 				 "$env{$FLT}/$sysarch{platform_generic}/bin",
 				 @sys_path);
 
     $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
+					    "$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
 					    "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot",
 					    );
 					    
 
     $env{PGPLOT_DIR} = add_unique_path($ENV{PGPLOT_DIR},
+				       "$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
 				       "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot");
     # Take just the first path value
     if (defined $env{PGPLOT_DIR}) {
