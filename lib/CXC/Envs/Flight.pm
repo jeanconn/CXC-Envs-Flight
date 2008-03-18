@@ -28,8 +28,8 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.19 2007-10-30 14:33:50 aldcroft Exp $';  # '
-our $VERSION = '1.8';
+our $version = '$Id: Flight.pm,v 1.20 2008-03-18 02:01:24 aca Exp $';  # '
+our $VERSION = '1.9';
 
 our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 		TST => '/proj/sot/tst',
@@ -128,7 +128,6 @@ sub flt_environment {
 		    $env{"${FLT}_PERLLIB"} . '/lib',
 		    $DEFAULT{SKA} . "/lib/perl",
 		    $DEFAULT{SKA} . "/lib/perl/lib");
-    push @perl5lib, $env{MST_PERLLIB} unless defined $ENV{SKA_RE};
 
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
 				     @perl5lib);
