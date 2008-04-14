@@ -8,7 +8,7 @@ require Exporter;
 use AutoLoader qw(AUTOLOAD);
 use Data::Dumper;
 
-our @ISA = qw(Exporter);
+my @ISA = qw(Exporter);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -17,20 +17,20 @@ our @ISA = qw(Exporter);
 # This allows declaration	use CXC::Envs::Flight ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
+my %EXPORT_TAGS = ( 'all' => [ qw(
 	
 ) ] );
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+my @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw(
+my @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.21 2008-04-14 18:07:34 aldcroft Exp $';  # '
-our $VERSION = '1.9';
+my $version = '$Id: Flight.pm,v 1.22 2008-04-14 18:13:52 aldcroft Exp $';  # '
+my $VERSION = '1.9';
 
-our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
+my %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
 		SYBASE => '/soft/sybase',
