@@ -1,8 +1,7 @@
 package CXC::Envs::Flight;
 
-use 5.008000;
+use 5.005000;
 use strict;
-use warnings;
 use Carp;
 
 require Exporter;
@@ -28,7 +27,7 @@ our @EXPORT = qw(
 	
 );
 
-our $version = '$Id: Flight.pm,v 1.20 2008-03-18 02:01:24 aca Exp $';  # '
+our $version = '$Id: Flight.pm,v 1.21 2008-04-14 18:07:34 aldcroft Exp $';  # '
 our $VERSION = '1.9';
 
 our %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
