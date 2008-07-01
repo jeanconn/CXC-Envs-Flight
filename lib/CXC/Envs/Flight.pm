@@ -28,7 +28,7 @@ my @EXPORT = qw(
 );
 
 my $version = '$Id: Flight.pm,v 1.22 2008-04-14 18:13:52 aldcroft Exp $';  # '
-my $VERSION = '1.9';
+our $VERSION = '1.91';
 
 my %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 		TST => '/proj/sot/tst',
