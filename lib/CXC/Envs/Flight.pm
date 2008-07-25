@@ -98,7 +98,7 @@ sub flt_environment {
     # Fill in values for anything that is not yet defined
     $env{$FLT} = $ENV{$FLT} || $DEFAULT{$FLT};
     foreach (keys %new) {
-	$env{"${FLT}_$_"} = $env{"${FLT}_$_"} || $ENV{"${FLT}_$_"} || "$env{$FLT}/$new{$_}";
+	$env{"${FLT}_$_"} = $ENV{"${FLT}_$_"} || "$env{$FLT}/$new{$_}";
     }
 
     $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
@@ -123,16 +123,19 @@ sub flt_environment {
     }
     chomp (my $OS = $sysarch{OS} || `uname -s`);
 
+    $env{"${FLT}_ARCH_OS"} = $env{"${FLT}_ARCH"} . "/" . $sysarch{platform_os_generic};
+    my $flt_arch_os = $env{"${FLT}_ARCH_OS"};
+
     my @sys_path;
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
-    my $flt_arch = $env{"${FLT}_ARCH"};
-    my @ld_lib_path = ("$flt_arch/$sysarch{platform_os_generic}/lib/pgplot");
+
+    my @ld_lib_path = ("$flt_arch_os/lib/pgplot");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
 				 $env{"${FLT}_BIN"},
-				 "$flt_arch/$sysarch{platform_os_generic}/bin",
+				 "$flt_arch_os/bin",
 				 @sys_path);
 
     $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
@@ -141,7 +144,7 @@ sub flt_environment {
 					    
 
     $env{PGPLOT_DIR} = add_unique_path($ENV{PGPLOT_DIR},
-				       "$flt_arch/$sysarch{platform_os_generic}/lib/pgplot");
+				       "$flt_arch_os/lib/pgplot");
     # Take just the first path value
     if (defined $env{PGPLOT_DIR}) {
 	$env{PGPLOT_DIR} = (split(':', $env{PGPLOT_DIR}))[0];
