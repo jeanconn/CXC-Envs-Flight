@@ -22,6 +22,8 @@ use Data::Dumper;
 
 $test = 2;
 
+$ENV{SKA} = '/proj/sot/ska';
+
 {
     local %ENV = CXC::Envs::Flight::env('ska');
     ok($ENV{SKA_DATA} eq '/proj/sot/ska/data', "Default environment\n");
