@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.92';
+our $VERSION = '1.93';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
@@ -91,6 +91,7 @@ sub flt_environment {
 	       DATA    => 'data',
 	       SHARE   => 'share',
 	       IDL     => 'idl',
+               ARCH    => 'arch',
 	       PERLLIB => 'lib/perl',
 	      );
 
@@ -125,14 +126,13 @@ sub flt_environment {
     my @sys_path;
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
-    my @ld_lib_path = ("$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
-                       "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot");
+    my $flt_arch = $env{"${FLT}_ARCH"};
+    my @ld_lib_path = ("$flt_arch/$sysarch{platform_os_generic}/lib/pgplot");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
 				 $env{"${FLT}_BIN"},
-				 "$env{$FLT}/$sysarch{platform_os_generic}/bin",
-				 "$env{$FLT}/$sysarch{platform_generic}/bin",
+				 "$flt_arch/$sysarch{platform_os_generic}/bin",
 				 @sys_path);
 
     $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
@@ -141,8 +141,7 @@ sub flt_environment {
 					    
 
     $env{PGPLOT_DIR} = add_unique_path($ENV{PGPLOT_DIR},
-				       "$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
-				       "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot");
+				       "$flt_arch/$sysarch{platform_os_generic}/lib/pgplot");
     # Take just the first path value
     if (defined $env{PGPLOT_DIR}) {
 	$env{PGPLOT_DIR} = (split(':', $env{PGPLOT_DIR}))[0];
