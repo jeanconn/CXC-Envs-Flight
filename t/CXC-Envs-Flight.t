@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 BEGIN { use_ok('CXC::Envs::Flight') };
 
 #########################
@@ -24,7 +24,6 @@ $test = 2;
 
 {
     local %ENV = CXC::Envs::Flight::env('ska');
-   map { print STDERR "$_ = $ENV{$_}\n" } keys %ENV;
     ok($ENV{SKA_DATA} eq '/proj/sot/ska/data', "Default environment\n");
     $test++;
 }
@@ -33,7 +32,6 @@ $test = 2;
     local %ENV = %ENV;
     $ENV{SKA} = '/proj/junk';
     %ENV = CXC::Envs::Flight::env('ska');
-#   map { print STDERR "$_ = $ENV{$_}\n" if /SKA|TST|AXAF|MST|PERL/ } keys %ENV;
     ok($ENV{SKA_DATA} eq '/proj/junk/data', "*** SKA = /proj/junk\n");
     $test++;
 }
@@ -41,8 +39,7 @@ $test = 2;
 {
     local %ENV = %ENV;
     $ENV{SKA_LIB} = '/proj/junk/lib';
-    %ENV = CXC::Envs::Flight::env('ska','tst');
-#   map { print STDERR "$_ = $ENV{$_}\n" if /SKA|TST|AXAF|MST|PERL/ } keys %ENV;
+    %ENV = CXC::Envs::Flight::env('ska');
     ok(($ENV{SKA_DATA} eq '/proj/sot/ska/data'
        and $ENV{SKA_LIB} eq '/proj/junk/lib'),
        "Set SKA_LIB = /proj/junk/lib\n");
@@ -52,31 +49,15 @@ $test = 2;
 {
     local %ENV = %ENV;
     %ENV = CXC::Envs::Flight::env('tst');
-#    map { print STDERR "$_ = $ENV{$_}\n" if /SKA|TST|AXAF|MST|PERL/ } keys %ENV;
     ok((not defined $ENV{SKA_DATA}
        and $ENV{TST_DATA} eq '/proj/sot/tst/data'), "Set TST environment\n");
     $test++;
 }
 
 {
-    local %ENV = %ENV;
-    my $flt_envs = '.ska_envs';
-    open ENV, "> $flt_envs" or die "Could not open $flt_envs";
-    print ENV "SKA = /proj/.ska_envs\n";
-    print ENV "SKA_DATA=/proj/ska_data/test\n";
-    close ENV;
-    %ENV = CXC::Envs::Flight::env('ska');
-#    map { print STDERR "$_ = $ENV{$_}\n" if /SKA|TST|AXAF|MST|PERL/ } keys %ENV;
-    unlink $flt_envs or die "Could not unlink $flt_envs";
-    ok(($ENV{SKA_DATA} eq '/proj/ska_data/test'
-       and $ENV{SKA} eq '/proj/.ska_envs'), "Use .flt_envs file");
-    $test++;
-}
-
-{
     $cmds_sh = CXC::Envs::Flight::shell_cmds('sh','tst');
     $cmds_tcsh =  CXC::Envs::Flight::shell_cmds('tcsh','ska');
-    $cmds_csh = CXC::Envs::Flight::shell_cmds('csh','tst','ska');
+    $cmds_csh = CXC::Envs::Flight::shell_cmds('csh','ska');
     ok(($cmds_sh =~ m|TST_DATA=/proj/sot/tst/data|
        and $cmds_csh =~ m|SKA_DATA /proj/sot/ska/data|
        and $cmds_tcsh =~ m|SKA_DATA /proj/sot/ska/data|),

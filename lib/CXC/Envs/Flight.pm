@@ -27,13 +27,12 @@ my @EXPORT = qw(
 	
 );
 
-my $version = '$Id: Flight.pm,v 1.22 2008-04-14 18:13:52 aldcroft Exp $';  # '
-our $VERSION = '1.91';
+our $VERSION = '1.92';
 
-my %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
+my %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
-		SYBASE => '/soft/sybase',
+		SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
 	       );
 
 # Preloaded methods go here.
@@ -46,15 +45,15 @@ my %DEFAULT = (SKA => $ENV{SKA_RE} || '/proj/sot/ska',
 sub shell_cmds {
 # Print shell commands to set new Ska environment variables
 ##***************************************************************************
-    unless (@_ >= 2) {
-	carp "CXC::Envs::Flight::shell_cmds - Usage: shell_cmds(<shell>, <Flt_env>, ...";
+    unless (@_ == 2) {
+	carp "CXC::Envs::Flight::shell_cmds - Usage: shell_cmds(<shell>, <Flt_env>)";
 	return;
     }
     my $shell = shift;
     my ($var, $val);
     my $cmds;
 
-    my %new = map { flt_environment($_) } @_;
+    my %new = flt_environment($_[0]);
     while (($var, $val) = each %new) {
 	if ($shell eq 'sh' or $shell eq 'ksh') {
 	    $cmds .= "$var=$val; export $var;\n";
@@ -70,16 +69,12 @@ sub shell_cmds {
 sub env {
 # Return complete new ENV variable including Flight values
 ##***************************************************************************
-    unless (@_ >= 1) {
-	carp "CXC::Envs::Flight::env - Usage: env(<Flt_env>, ...";
+    unless (@_ == 1) {
+	carp "CXC::Envs::Flight::env - Usage: env(<Flt_env>)";
 	return %ENV;
     }
 
-    my %env;
-    foreach (@_) {
-	%env = (%env, flt_environment($_));
-    }
-    return (%ENV, %env);
+    return (%ENV, flt_environment($_[0]));
 }
 
 ##***************************************************************************
@@ -99,20 +94,8 @@ sub flt_environment {
 	       PERLLIB => 'lib/perl',
 	      );
 
-    # Look for a file ".${flt}_envs" in the current directory which will override all 
-    # defaults and current Env vars
-    if (-r ".${flt}_envs") {
-	open(ENV, ".${flt}_envs") or die "Unexpected read failure for .${flt}_envs: $!";
-	while (<ENV>) {
-	    next if (/\A \s* \#/x);
-	    next unless (my ($key, $val) = /(\S+) \s* = (.+)/x); 
-	    ($env{$key} = $val) =~ s/\A\s+|\s+\Z//g ;
-	}
-	close ENV;
-    }
-
-    # Now fill in values for anything that is not yet defined
-    $env{$FLT} = $env{$FLT} || $ENV{$FLT} || $DEFAULT{$FLT};
+    # Fill in values for anything that is not yet defined
+    $env{$FLT} = $ENV{$FLT} || $DEFAULT{$FLT};
     foreach (keys %new) {
 	$env{"${FLT}_$_"} = $env{"${FLT}_$_"} || $ENV{"${FLT}_$_"} || "$env{$FLT}/$new{$_}";
     }
@@ -124,27 +107,27 @@ sub flt_environment {
 
     # Set Perl library path.  Start with SKA_PERLLIB, then /proj/sot/ska/lib/perl, then MST_PERLLIB
     my @perl5lib = ($env{"${FLT}_PERLLIB"},
-		    $env{"${FLT}_PERLLIB"} . '/lib',
-		    $DEFAULT{SKA} . "/lib/perl",
-		    $DEFAULT{SKA} . "/lib/perl/lib");
+		    $env{"${FLT}_PERLLIB"} . '/lib');
 
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
 				     @perl5lib);
 
     # Find a version of sysarch and run it to determine the system architecture
     my %sysarch;
-    for my $sysarch_path ($env{"${FLT}_BIN"}, "$DEFAULT{SKA}/bin") {
-	my $sysarch = "$sysarch_path/sysarch";
-	if (-x $sysarch) {
-	    my $sysarch_values = `$sysarch -perl_hash`;
-	    %sysarch = eval "( $sysarch_values )";
-	}
+    for my $path ($env{"${FLT}_BIN"}, "$DEFAULT{SKA}/bin") {
+        if (-x "$path/sysarch") {
+            %sysarch = eval "(" . `$path/sysarch -perl_hash` . ")";
+            last;
+        }
     }
     chomp (my $OS = $sysarch{OS} || `uname -s`);
 
     my @sys_path;
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
+    my @ld_lib_path = ("$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
+                       "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot");
+    push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
 				 $env{"${FLT}_BIN"},
@@ -153,8 +136,7 @@ sub flt_environment {
 				 @sys_path);
 
     $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
-					    "$env{$FLT}/$sysarch{platform_os_generic}/lib/pgplot",
-					    "$env{$FLT}/$sysarch{platform_generic}/lib/pgplot",
+					    @ld_lib_path,
 					    );
 					    
 
@@ -211,14 +193,14 @@ CXC::Envs::Flight - Perl extension to set environment variables for Aspect opera
 
   use CXC::Envs::Flight;
 
-  local %ENV = CXC::Envs::Flight::env('ska','tst'); # Adds Ska and TST env to existing ENV
+  local %ENV = CXC::Envs::Flight::env('ska'); # Adds Ska env to existing ENV
   $cmds = CXC::Envs::Flight::shell_cmds('tcsh','ska');     # Return tcsh commands to set environment
-                                            # Allowed options are tcsh, csh, sh
+                                            # Allowed options are tcsh, csh, sh, ksh
 
 =head1 DESCRIPTION
 
 This module sets environment variables for "Flight" software, which 
-currently includes aspect operations tools (Ska) and TST tools (TST).
+currently includes aspect operations tools (Ska).  
 
 If the "ska" environoment is requested, the following environment variables are
 set unless already defined:
@@ -233,24 +215,10 @@ set unless already defined:
     SKA_PERLLIB    $SKA/lib/perl
     MST_ROOT       /proj/axaf
     MST_PERLLIB    ${MST_ROOT}/simul/lib/perl
+    SYBASE         /soft/SYBASE_OCS15
 
-It also puts SKA_BIN at the head of the PATH and puts SKA_PERLLIB and MST_PERLLIB
-at the head of the PERL5LIB path.
-
-If the file .ska_envs is present in the run directory, CXC::Envs::Flight will use these 
-values to override any defaults or environment variables.  This file consists
-of name-value pairs, one on each line:
-  
-   <VAR> = <VALUE>
-
-Spaces are not important, and lines preceded by # are ignored.  Variable substitution
-(e.g. SKA_LIB = $SKA/my_lib) is not allowed.
-
-Likewise, the TST environment sets all the corresponding variables with SKA => TST, where
-the default TST root directory is
-
-                   Default
-    TST            /proj/sot/tst
+It also updates PATH, LD_LIBRARY_PATH, PERL5LIB, and PGPLOT_DIR to make the Ska
+environment (tools and libraries) available and functional.
 
 =head1 FUNCTIONS
 
@@ -258,20 +226,17 @@ The following functions are provided
 
 =over 8
 
-=item env(<Flt_env>, ...)
+=item env(<Flt_env>)
 
 Generates the environment variables for the specified flight environments.
-Allowed values of <Flt_env> are 'ska' and 'tst'.  If multiple values
-are specified, they are added from left to right, so libraries/paths from the
-last one will take precedence.
+Allowed values of <Flt_env> are 'ska'.  Support for additional environments
+is possible in the future.
 
-=item shell_cmds(<shell_type>, <Flt_env>, ...)
+=item shell_cmds(<shell_type>, <Flt_env>)
 
 Generates the shell commands to set environment variables for the specified
 flight environments.  The supported shells are sh, ksh, csh, and tcsh. 
-Allowed values of <Flt_env> are 'ska' and 'tst'.  If multiple values are
-specified, they are added from left to right, so libraries/paths from the last
-one will take precedence.
+Allowed values of <Flt_env> are 'ska'.
 
 =head1 SEE ALSO
 
