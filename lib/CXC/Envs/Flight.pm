@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.94';
+our $VERSION = '1.95';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
@@ -95,10 +95,11 @@ sub flt_environment {
 	       PERLLIB => 'lib/perl',
 	      );
 
-    # Fill in values for anything that is not yet defined
+    # Fill in values for all env vars
+    # NOTE change: existing values are always clobbered -> no fine tuning.  This is OK.
     $env{$FLT} = $ENV{$FLT} || $DEFAULT{$FLT};
     foreach (keys %new) {
-	$env{"${FLT}_$_"} = $ENV{"${FLT}_$_"} || "$env{$FLT}/$new{$_}";
+	$env{"${FLT}_$_"} = "$env{$FLT}/$new{$_}";
     }
 
     $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
