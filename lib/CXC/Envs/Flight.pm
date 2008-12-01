@@ -33,6 +33,7 @@ my %DEFAULT = (SKA => '/proj/sot/ska',
 		TST => '/proj/sot/tst',
 		MST => '/proj/axaf',
 		SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
+		SYBASE_OCS => 'OCS-15_0',  
 	       );
 
 # Preloaded methods go here.
@@ -103,6 +104,7 @@ sub flt_environment {
     }
 
     $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
+    $env{SYBASE_OCS} = $ENV{SYBASE_OCS} || $DEFAULT{SYBASE_OCS};
     $env{AXAF_ROOT} = $ENV{AXAF_ROOT} || $DEFAULT{MST};
     $env{MST_PERLLIB} = $ENV{MST_PERLLIB} || "$DEFAULT{MST}/simul/lib/perl";
 
@@ -131,7 +133,7 @@ sub flt_environment {
     @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
     @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
 
-    my @ld_lib_path = ("$flt_arch_os/pgplot");
+    my @ld_lib_path = ("$flt_arch_os/pgplot", "$env{SYBASE}/$env{SYBASE_OCS}/lib");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
@@ -151,6 +153,8 @@ sub flt_environment {
     if (defined $env{PGPLOT_DIR}) {
 	$env{PGPLOT_DIR} = (split(':', $env{PGPLOT_DIR}))[0];
     }
+
+    $env{CFITSIO} = "$flt_arch_os";
 
     # Clean out any new ENV vars that are not defined (i.e. no such paths existed)
     foreach (keys %env) {
