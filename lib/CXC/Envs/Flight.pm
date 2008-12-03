@@ -30,11 +30,9 @@ my @EXPORT = qw(
 our $VERSION = '1.95';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
-		TST => '/proj/sot/tst',
-		MST => '/proj/axaf',
-		SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
-		SYBASE_OCS => 'OCS-15_0',  
-	       );
+               SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
+               SYBASE_OCS => 'OCS-15_0',  
+              );
 
 # Preloaded methods go here.
 
@@ -93,7 +91,6 @@ sub flt_environment {
 	       SHARE   => 'share',
 	       IDL     => 'idl',
                ARCH    => 'arch',
-	       PERLLIB => 'lib/perl',
 	      );
 
     # Fill in values for all env vars
@@ -105,16 +102,6 @@ sub flt_environment {
 
     $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
     $env{SYBASE_OCS} = $ENV{SYBASE_OCS} || $DEFAULT{SYBASE_OCS};
-    $env{AXAF_ROOT} = $ENV{AXAF_ROOT} || $DEFAULT{MST};
-    $env{MST_PERLLIB} = $ENV{MST_PERLLIB} || "$DEFAULT{MST}/simul/lib/perl";
-
-
-    # Set Perl library path.  Start with SKA_PERLLIB, then /proj/sot/ska/lib/perl, then MST_PERLLIB
-    my @perl5lib = ($env{"${FLT}_PERLLIB"},
-		    $env{"${FLT}_PERLLIB"} . '/lib');
-
-    $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
-				     @perl5lib);
 
     # Find a version of sysarch and run it to determine the system architecture
     my %sysarch;
@@ -129,22 +116,21 @@ sub flt_environment {
     $env{"${FLT}_ARCH_OS"} = $env{"${FLT}_ARCH"} . "/" . $sysarch{platform_os_generic};
     my $flt_arch_os = $env{"${FLT}_ARCH_OS"};
 
-    my @sys_path;
-    @sys_path = qw(/usr/ccs/bin /usr/ucb /usr/bin /usr/local/bin /opt/local/bin) if ($OS eq 'SunOS');
-    @sys_path = qw(/bin /usr/bin /usr/local/bin) if ($OS eq 'Linux');
+    # Set Perl library path.  
+    my @perl5lib = ($env{$FLT} . "/lib/perl", $env{$FLT} . "/lib/perl/lib");
+    $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
+				     @perl5lib);
 
     my @ld_lib_path = ("$flt_arch_os/pgplot", "$env{SYBASE}/$env{SYBASE_OCS}/lib");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
 				 $env{"${FLT}_BIN"},
-				 "$flt_arch_os/bin",
-				 @sys_path);
+				 "$flt_arch_os/bin");
 
     $env{LD_LIBRARY_PATH} = add_unique_path($ENV{LD_LIBRARY_PATH},
 					    @ld_lib_path,
 					    );
-					    
 
     $env{PGPLOT_DIR} = add_unique_path("$flt_arch_os/pgplot",
                                        $ENV{PGPLOT_DIR},
@@ -220,9 +206,6 @@ set unless already defined:
     SKA_DATA       $SKA/data
     SKA_SHARE      $SKA/share
     SKA_IDL        $SKA/idl
-    SKA_PERLLIB    $SKA/lib/perl
-    MST_ROOT       /proj/axaf
-    MST_PERLLIB    ${MST_ROOT}/simul/lib/perl
     SYBASE         /soft/SYBASE_OCS15
 
 It also updates PATH, LD_LIBRARY_PATH, PERL5LIB, and PGPLOT_DIR to make the Ska
