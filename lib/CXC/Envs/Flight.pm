@@ -41,6 +41,21 @@ my %DEFAULT = (SKA => '/proj/sot/ska',
 1;
 
 ##***************************************************************************
+sub new {
+    my $class = shift;
+    my $self = {};
+    bless $self, $class;
+    my $flt_env = shift;
+    unless ( defined $flt_env ) {
+	carp(__PACKAGE__ . ": Usage: CXC::Envs::Flight->new(<Flt_env>)");    
+    }
+    $self->env($flt_env);
+    return $self;
+}    
+
+
+
+##***************************************************************************
 sub shell_cmds {
 # Print shell commands to set new Ska environment variables
 ##***************************************************************************
@@ -68,6 +83,8 @@ sub shell_cmds {
 sub env {
 # Return complete new ENV variable including Flight values
 ##***************************************************************************
+    
+    
     unless (@_ == 1) {
 	carp "CXC::Envs::Flight::env - Usage: env(<Flt_env>)";
 	return %ENV;
