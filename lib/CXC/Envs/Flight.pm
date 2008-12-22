@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.95';
+our $VERSION = '1.96';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
                SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
@@ -39,21 +39,6 @@ my %DEFAULT = (SKA => '/proj/sot/ska',
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
-
-##***************************************************************************
-sub new {
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    my $flt_env = shift;
-    unless ( defined $flt_env ) {
-	carp(__PACKAGE__ . ": Usage: CXC::Envs::Flight->new(<Flt_env>)");    
-    }
-    $self->env($flt_env);
-    return $self;
-}    
-
-
 
 ##***************************************************************************
 sub shell_cmds {
@@ -83,8 +68,6 @@ sub shell_cmds {
 sub env {
 # Return complete new ENV variable including Flight values
 ##***************************************************************************
-    
-    
     unless (@_ == 1) {
 	carp "CXC::Envs::Flight::env - Usage: env(<Flt_env>)";
 	return %ENV;
@@ -117,8 +100,8 @@ sub flt_environment {
 	$env{"${FLT}_$_"} = "$env{$FLT}/$new{$_}";
     }
 
-    $env{SYBASE} = $ENV{SYBASE} || $DEFAULT{SYBASE};
-    $env{SYBASE_OCS} = $ENV{SYBASE_OCS} || $DEFAULT{SYBASE_OCS};
+    $env{SYBASE} = $DEFAULT{SYBASE};
+    $env{SYBASE_OCS} = $DEFAULT{SYBASE_OCS};
 
     # Find a version of sysarch and run it to determine the system architecture
     my %sysarch;
@@ -213,7 +196,7 @@ CXC::Envs::Flight - Perl extension to set environment variables for Aspect opera
 This module sets environment variables for "Flight" software, which 
 currently includes aspect operations tools (Ska).  
 
-If the "ska" environoment is requested, the following environment variables are
+If the "ska" environment is requested, the following environment variables are
 set unless already defined:
 
                    Default
@@ -223,7 +206,11 @@ set unless already defined:
     SKA_DATA       $SKA/data
     SKA_SHARE      $SKA/share
     SKA_IDL        $SKA/idl
+
+The SYBASE and SYBASE_OCS variables are set (and will override any already defined in the shell ).
+
     SYBASE         /soft/SYBASE_OCS15
+    SYBASE_OCS     OCS-15_0
 
 It also updates PATH, LD_LIBRARY_PATH, PERL5LIB, and PGPLOT_DIR to make the Ska
 environment (tools and libraries) available and functional.
