@@ -4,4 +4,3 @@ MANIFEST
 README
 t/CXC-Envs-Flight.t
 lib/CXC/Envs/Flight.pm
-META.yml                                 Module meta-data (added by MakeMaker)
