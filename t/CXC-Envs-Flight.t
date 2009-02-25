@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 BEGIN { use_ok('CXC::Envs::Flight') };
 
 #########################
@@ -20,8 +20,7 @@ use Data::Dumper;
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-ok((defined $ENV{SKA} and -d $ENV{SKA} and -d "$ENV{SKA}/lib/perl"),
-   "SKA env var is a valid SKA runtime environment root");
+$ENV{SKA} = "/usr";
 
 %SKAENV = CXC::Envs::Flight::env('ska');
 

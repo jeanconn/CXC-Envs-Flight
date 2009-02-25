@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.96';
+our $VERSION = '1.97';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
                SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
@@ -121,7 +121,9 @@ sub flt_environment {
     $env{PERL5LIB} = add_unique_path($ENV{PERL5LIB},
 				     @perl5lib);
 
-    my @ld_lib_path = ("$flt_arch_os/pgplot", "$env{SYBASE}/$env{SYBASE_OCS}/lib");
+    my @ld_lib_path = ("$flt_arch_os/lib",
+                       "$flt_arch_os/pgplot",
+                       "$env{SYBASE}/$env{SYBASE_OCS}/lib");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
