@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.97';
+our $VERSION = '1.98';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
                SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
@@ -123,10 +123,12 @@ sub flt_environment {
 
     my @ld_lib_path = ("$flt_arch_os/lib",
                        "$flt_arch_os/pgplot",
+                       "/usr/cuda/lib",
                        "$env{SYBASE}/$env{SYBASE_OCS}/lib");
     push @ld_lib_path, "/usr/local/lib" if ($OS eq 'SunOS');
 
     $env{PATH} = add_unique_path($ENV{PATH},
+                                 "/usr/cuda/bin",
 				 $env{"${FLT}_BIN"},
 				 "$flt_arch_os/bin");
 
