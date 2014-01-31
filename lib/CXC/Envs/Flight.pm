@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.98';
+our $VERSION = '1.99';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
                SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
@@ -173,6 +173,7 @@ sub add_unique_path {
 	next unless defined $_;
 	next if $new_path{$_};
 	next unless -d $_;
+	next if $_ =~ m|^/home/greta/|;
 	push @new_path, $_;
 	$new_path{$_} = 1;
     }
