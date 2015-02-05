@@ -27,7 +27,7 @@ my @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.99';
+our $VERSION = '2.01';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
                SYBASE => '/soft/SYBASE15.7',  # Eventually change back to /soft/sybase
