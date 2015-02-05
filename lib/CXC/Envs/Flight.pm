@@ -30,7 +30,7 @@ my @EXPORT = qw(
 our $VERSION = '1.99';
 
 my %DEFAULT = (SKA => '/proj/sot/ska',
-               SYBASE => '/soft/SYBASE_OCS15',  # Eventually change back to /soft/sybase
+               SYBASE => '/soft/SYBASE15.7',  # Eventually change back to /soft/sybase
                SYBASE_OCS => 'OCS-15_0',  
               );
 
@@ -214,7 +214,7 @@ set unless already defined:
 
 The SYBASE and SYBASE_OCS variables are set (and will override any already defined in the shell ).
 
-    SYBASE         /soft/SYBASE_OCS15
+    SYBASE         /soft/SYBASE15.7
     SYBASE_OCS     OCS-15_0
 
 It also updates PATH, LD_LIBRARY_PATH, PERL5LIB, and PGPLOT_DIR to make the Ska
